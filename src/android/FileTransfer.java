@@ -37,6 +37,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.Inflater;
 
@@ -286,7 +287,7 @@ public class FileTransfer extends CordovaPlugin {
         final JSONObject params = args.optJSONObject(5) == null ? new JSONObject() : args.optJSONObject(5);
         final boolean trustEveryone = args.optBoolean(6);
         // Always use chunked mode unless set to false as per API
-        final boolean chunkedMode = args.optBoolean(7) || args.isNull(7);
+        final boolean chunkedMode = false; //args.optBoolean(7) || args.isNull(7);
         // Look for headers on the params map for backwards compatibility with older Cordova versions.
         final JSONObject headers = args.optJSONObject(8) == null ? params.optJSONObject("headers") : args.optJSONObject(8);
         final String objectId = args.getString(9);
@@ -438,6 +439,7 @@ public class FileTransfer extends CordovaPlugin {
                         // Although setChunkedStreamingMode sets this header, setting it explicitly here works
                         // around an OutOfMemoryException when using https.
                         conn.setRequestProperty("Transfer-Encoding", "chunked");
+                        conn.setChunkedStreamingMode(0);
                     } else {
                         conn.setFixedLengthStreamingMode(fixedLength);
 
@@ -543,6 +545,9 @@ public class FileTransfer extends CordovaPlugin {
                     // send request and retrieve response
                     result.setResponseCode(responseCode);
                     result.setResponse(responseString);
+                    HashMap<String, String> headers = new HashMap<String, String>();
+                    headers.put("Authorization",  conn.getHeaderFields().get("Authorization").get(0));
+                    result.setHeaders(headers);
 
                     context.sendPluginResult(new PluginResult(PluginResult.Status.OK, result.toJSONObject()));
                 } catch (FileNotFoundException e) {
