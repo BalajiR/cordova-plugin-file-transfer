@@ -21,6 +21,9 @@ package org.apache.cordova.filetransfer;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * Encapsulates the result and/or status of uploading a file to a remote server.
  */
@@ -30,6 +33,7 @@ public class FileUploadResult {
     private int responseCode = -1;      // HTTP response code
     private String response = null;     // HTTP response
     private String objectId = null;     // FileTransfer object id
+    private Map<String, String> headers = null; // response headers
 
     public long getBytesSent() {
         return bytesSent;
@@ -65,9 +69,18 @@ public class FileUploadResult {
 
     public JSONObject toJSONObject() throws JSONException {
         return new JSONObject(
-                "{bytesSent:" + bytesSent +
+                "{headers:" + new JSONObject(headers) +
+                ",bytesSent:" + bytesSent +
                 ",responseCode:" + responseCode +
                 ",response:" + JSONObject.quote(response) +
                 ",objectId:" + JSONObject.quote(objectId) + "}");
+    }
+
+    public Map<String, String> getHeaders() {
+        return headers;
+    }
+
+    public void setHeaders(Map<String, String> headers) {
+        this.headers = headers;
     }
 }
